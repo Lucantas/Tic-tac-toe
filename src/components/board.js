@@ -15,7 +15,6 @@ const Board = function() {
                 tile = this.row.querySelector("[data-id=tile].hidden").cloneNode();
                 tile.dataset.tileIndex = "tile" + j;
                 tile.classList.remove("hidden");
-                console.log(tile)
                 tile.appendChild(document.createElement("i"));
                 this.boardElement.querySelector(`[data-index=row${i}]`).appendChild(tile);                
             }
@@ -27,10 +26,10 @@ const Board = function() {
 function setMarker(tile){
     var _i = tile.querySelector("i");
     if (tile.dataset.marker == "empty"){
-        _i.className = tileStates[match.players.current];
+        _i.className = tileStates[app.match.players.current];
         tile.dataset.marker = "filled";
-        tile.dataset.state = match.players.current;        
-        if(!match.checkMove(tile)) match.players.toggle();
+        tile.dataset.state = app.match.players.current;        
+        if(!app.match.checkMove(tile)) app.match.players.toggle();
         else app.handleWin();
     }
 }
@@ -55,16 +54,16 @@ const Match = function(){
         let thisState = tile.dataset.state;
         // is the tile's row filled with that state
         let thisRowWithState = tile.closest("[data-id=row]")
-            .querySelectorAll(`[data-id=tile][data-state=${match.players.current}]`);
+            .querySelectorAll(`[data-id=tile][data-state=${app.match.players.current}]`);
         if(thisRowWithState != null && thisRowWithState.length == 3){
             return true;
         }   
 
         // is the tile's collumn filled with that state
         let thisColumnWithState = tile.closest("[data-id=row]").querySelectorAll("[data-id=tile]");
-        let rowIndex = Array.prototype.indexOf.call(thisColumnWithState,tile);
+        let tileIndex = Array.prototype.indexOf.call(thisColumnWithState,tile);
         let stateInCollumn = 0;
-        document.querySelectorAll(`[data-tile-index=tile${rowIndex}]`).forEach((rowTile, index) => {
+        document.querySelectorAll(`[data-tile-index=tile${tileIndex}]`).forEach((rowTile, index) => {
             if(rowTile.dataset.state == thisState){
                 stateInCollumn++;
             }            
@@ -76,25 +75,93 @@ const Match = function(){
 
         // are the tile's diagonals filled with that state
 
-        let stateInDiagonals;
+        let stateInDiagonals = 0;
 
-        for (let i = 0; i<this.rows.length; i++) {
-            if (this.rows[i] != tile.closest("[data-id=row]")){
-                let matchTile = this.rows[i].querySelector(`[data-id=tile][data-state=${thisState}]`);
-                if (matchTile != null){
-                    let tileIndex = Array.prototype.indexOf.call(matchTile);
-                    switch(tileIndex){
-                        case rowindex -1:
-                        case rowindex + 1:
-                        case rowindex - 2:
-                        case rowindex + 2:
+        // get the current rowIndex and tileIndex
+        let rowIndex = parseInt(tile.closest("[data-id=row]").dataset.index.split("row")[1]);
+
+        if (isDiagonal(rowIndex,tileIndex)){
+            switch(tileIndex){
+                case 0:
+                    if(rowIndex < this.rows.length - 2){
+                        if(
+                            this.rows[rowIndex + 1].querySelector(`[data-tile-index=tile${tileIndex + 1}]`).dataset.state == thisState
+                        ){
                             stateInDiagonals++;
+                        }
+                        if(
+                            this.rows[rowIndex + 2].querySelector(`[data-tile-index=tile${tileIndex + 2}]`).dataset.state == thisState
+                        ){
+                            stateInDiagonals++;
+                        }
+                    } 
+                    
+                    else {
+                        if(
+                            this.rows[rowIndex - 1].querySelector(`[data-tile-index=tile${tileIndex + 1}]`).dataset.state == thisState
+                        ){
+                            stateInDiagonals++;
+                        }
+                        if(
+                            this.rows[rowIndex - 2].querySelector(`[data-tile-index=tile${tileIndex + 2}]`).dataset.state == thisState
+                        ){
+                            stateInDiagonals++;
+                        } 
                     }
-                }
+
+                    break;
+                case 1:
+                    if(
+                        this.rows[rowIndex - 1].querySelector(`[data-tile-index=tile${tileIndex - 1}]`).dataset.state == thisState
+                    ){
+                        stateInDiagonals++;
+                    }
+                    if(
+                        this.rows[rowIndex - 1].querySelector(`[data-tile-index=tile${tileIndex + 1}]`).dataset.state == thisState
+                    ){
+                        
+                    }
+                    if(
+                        this.rows[rowIndex + 1].querySelector(`[data-tile-index=tile${tileIndex + 1}]`).dataset.state == thisState
+                    ){
+                        stateInDiagonals++;
+                    }
+                    if(
+                        this.rows[rowIndex + 1].querySelector(`[data-tile-index=tile${tileIndex - 1}]`).dataset.state == thisState
+                    ){
+                        stateInDiagonals++;
+                    }
+                    break;
+                case 2:
+                    if (rowIndex > 1){
+                        if(
+                            this.rows[rowIndex - 1].querySelector(`[data-tile-index=tile${tileIndex - 1}]`).dataset.state == thisState   
+                        ){
+                            stateInDiagonals++;
+                        }
+                        if(
+                            this.rows[rowIndex - 2].querySelector(`[data-tile-index=tile${tileIndex - 2}]`).dataset.state == thisState   
+                        ){
+                            stateInDiagonals++;
+                        }
+                    } else {
+                        if(
+                            this.rows[rowIndex + 1].querySelector(`[data-tile-index=tile${tileIndex - 1}]`).dataset.state == thisState   
+                        ){
+                            stateInDiagonals++;
+                        }
+                        if(
+                            this.rows[rowIndex + 2].querySelector(`[data-tile-index=tile${tileIndex - 2}]`).dataset.state == thisState   
+                        ){
+                            stateInDiagonals++;
+                        }
+                    }
+                    break;
             }
+
         }
 
-        if(stateInDiagonals > 2){
+        if(stateInDiagonals > 1){
             return true;
         }
 
@@ -102,6 +169,18 @@ const Match = function(){
         if (!document.querySelectorAll("[data-id=tile][data-marker=empty]").length){
             app.handleDraw();
         }
+    }
+}
+
+function isDiagonal(rowIndex,tileIndex){
+    if(rowIndex == tileIndex) return true;
+
+    if(rowIndex == 0 && tileIndex == 2){
+        return true;
+    } 
+
+    if(rowIndex == 2 && tileIndex == 0){
+        return true;
     }
 }
 
