@@ -5,8 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Tic tac toe</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">    <link rel="stylesheet" href="css/colors.css">
 </head>
 <body>
     <!-- Table -->
+    <section id="gameContent" class="content">
+        <div id="gameBoard" class="board md bg-black">
+            <div data-id="row" data-template="row" class="row">
+                <div data-id="tile" class="hidden tile bg-white" onclick="setMarker(this)" data-marker="empty">
+                    <i class="fas font-8em"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="components/app.js"></script>
+    <script src="components/board.js"></script>
 </body>
 </html>

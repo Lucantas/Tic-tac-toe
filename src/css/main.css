@@ -1,0 +1,52 @@
+html, body {
+    background-color: #212121;
+}
+
+.hidden {
+    display:none !important;
+}
+
+.tile {
+    background-color: blue;
+    width:100%;
+    height:130px;
+    padding:5px;
+    margin:auto 5px;
+    display: flex;
+    justify-content: center;
+}
+
+.board.md{
+    width: 500px;
+    height: 450px;
+    padding: 25px;
+}
+
+.row{
+    width: 100%;
+    display: flex;
+    flex-grow: unset;
+    margin: 5px auto;
+}
+
+.content{
+    display: flex;
+    justify-content: center;
+    align-self: center;
+    align-items: center;
+    align-content: center;
+    width: 100%;
+    height: 100vh;
+}
+
+.font-8em{
+    font-size: 8em;
+}
+
+.font-6em{
+    font-size: 6em;
+}
+
+.pad-top-18{
+    padding-top:18px;
+}
